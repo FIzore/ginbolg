@@ -1,34 +1,35 @@
 package utils
 
 import (
-	"log"
 	"gopkg.in/ini.v1"
+	"log"
 )
 
-var(
-	AppMode string
+var (
+	AppMode  string
 	HttpPort string
 
-	Db string
-	DbHost string
-	DbUser string
+	Db         string
+	DbHost     string
+	DbUser     string
 	DbPassword string
-	DbName string
+	DbName     string
 )
-func init(){
-	file, err := ini.Load("../config/config.ini")
+
+func init() {
+	file, err := ini.Load("config/config.ini")
 	if err != nil {
 		log.Println("配置文件读取失败")
 	}
 	LoadServer(file)
 	LoadDatabase(file)
 }
-func LoadServer(file *ini.File){
+func LoadServer(file *ini.File) {
 	AppMode = file.Section("server").Key("AppMode").MustString("debug")
 	HttpPort = file.Section("server").Key("HttpPort").MustString(":3000")
 
 }
-func LoadDatabase(file *ini.File){
+func LoadDatabase(file *ini.File) {
 	Db = file.Section("database").Key("Db").MustString("mysql")
 	DbHost = file.Section("database").Key("DbHost").MustString("3306")
 	DbUser = file.Section("database").Key("DbUser").MustString("ginblog")

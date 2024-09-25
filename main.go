@@ -1,6 +1,7 @@
 package main
 
-import "gin-blog/routes"
-func main(){
+import "ginblog/routes"
+
+func main() {
 	routes.InitRouter()
 }
