@@ -9,7 +9,8 @@ var (
 	AppMode  string
 	HttpPort string
 
-	Db         string
+	//Db         string
+	DBAddress  string
 	DbHost     string
 	DbUser     string
 	DbPassword string
@@ -30,7 +31,8 @@ func LoadServer(file *ini.File) {
 
 }
 func LoadDatabase(file *ini.File) {
-	Db = file.Section("database").Key("Db").MustString("mysql")
+	//Db = file.Section("database").Key("Db").MustString("mysql")
+	DBAddress = file.Section("database").Key("DBAddress").MustString("localhost")
 	DbHost = file.Section("database").Key("DbHost").MustString("3306")
 	DbUser = file.Section("database").Key("DbUser").MustString("ginblog")
 	DbPassword = file.Section("database").Key("DbPassword").MustString("admin123")

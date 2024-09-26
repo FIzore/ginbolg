@@ -17,5 +17,5 @@ func InitRouter() {
 			})
 		})
 	}
-	r.Run(utils.HttpPort)
+	_ = r.Run(utils.HttpPort)
 }
