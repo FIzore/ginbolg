@@ -18,7 +18,7 @@ type User struct {
 
 // CreateUser 新增用户
 func CreateUser(data *User) int {
-	data.Password = ScryptPw(data.Password) //对密码进行加密
+	//data.Password = ScryptPw(data.Password) //对密码进行加密，或者对数据库使用钩子函数
 	err := db.Create(&data).Error
 	if err != nil {
 		return errmsg.ERROR //500
@@ -30,11 +30,10 @@ func CreateUser(data *User) int {
 // CheckUser 查询用户是否存在
 func CheckUser(name string) int {
 	var users User
-	db.Select("id").Where("username = ?", name).First(&users)
+	db.Select("id").Where("username = ?", name).First(&users) //todo 优化RowsAffected
 	if users.ID > 0 {
 		return errmsg.ERROR_USERNAME_USED //1001
 	}
-
 	return errmsg.SUCCESS //200
 }
 
@@ -49,9 +48,34 @@ func GetUsers(pageSize int, pageNum int) []User {
 	return users
 }
 
-// 编辑用户
+// EditUser 编辑用户
+func EditUser(id int, data *User) int {
+	var user User
+	var maps = make(map[string]interface{})
+	maps["username"] = data.Username
+	maps["role"] = data.Role
+	err = db.Model(&user).Where("id = ?", id).Updates(maps).Error
+	if err != nil {
+		return errmsg.ERROR
+	}
+	return errmsg.SUCCESS
+}
 
 // DeleteUser 删除用户
+func DeleteUser(id int) int {
+	var user User
+	err = db.Where("id = ?", id).Delete(&user).Error
+	if err != nil {
+		return errmsg.ERROR
+	}
+	return errmsg.SUCCESS
+}
+
+// BeforeCreate 或者使用钩子函数进行加密
+func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
+	u.Password = ScryptPw(u.Password)
+	return
+}
 
 // ScryptPw 密码加密
 func ScryptPw(password string) string {

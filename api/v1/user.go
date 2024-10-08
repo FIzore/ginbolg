@@ -55,11 +55,28 @@ func GetUsers(c *gin.Context) {
 }
 
 // EditUser 编辑用户
-func EditUser(c *gin.Context) {
-	//
+func EditUser(c *gin.Context) { //todo username不能重复或许使用unique约束
+	var data model.User
+	id, _ := strconv.Atoi(c.Param("id"))
+	c.ShouldBindJSON(&data)               //判断一下如果用户名存在且id不是当前用户id就说明真实存在，不能修改
+	code = model.CheckUser(data.Username) //目前这个逻辑如果我不修改用户名，就无法修改邮箱和头像等其他信息
+	if code == errmsg.SUCCESS {           //todo 逻辑问题优化
+		model.EditUser(id, &data)
+	} else {
+		c.Abort()
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"status":  code,
+		"message": errmsg.GetErrMsg(code),
+	})
 }
 
 // DeleteUser 删除用户
 func DeleteUser(c *gin.Context) {
-	//
+	id, _ := strconv.Atoi(c.Param("id"))
+	code = model.DeleteUser(id)
+	c.JSON(http.StatusOK, gin.H{
+		"status":  code,
+		"message": errmsg.GetErrMsg(code),
+	})
 }
