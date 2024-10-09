@@ -74,5 +74,3 @@ func DeleteCate(c *gin.Context) {
 }
 
 //查询单个分类下的文章
-
-//查询分类列表
