@@ -16,6 +16,7 @@ const (
 	// code=3000...分类模块的错误
 	ERROR_CATEGORY_NOT_EXIST = 3000 //分类不存在
 	ERROR_CATEGORY_USED      = 3001 //分类已存在
+
 )
 
 var codeMsg = map[int]string{ //
