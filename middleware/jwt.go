@@ -13,22 +13,22 @@ var JwtKey = []byte(utils.JwtKey)
 
 type MyClaims struct {
 	Username string `json:"username"`
-	Password string `json:"password"`
+	//Password string `json:"password"`
 	jwt.StandardClaims
 }
 
 // SetToken 生成token
-func SetToken(username string, password string) (string, int) {
+func SetToken(username string) (string, int) {
 	expireTime := time.Now().Add(10 * time.Hour) //设置过期时间
 	SetClaims := MyClaims{
 		username,
-		password,
+		//password,
 		jwt.StandardClaims{
 			ExpiresAt: expireTime.Unix(),
 			Issuer:    "ginblog",
 		},
 	}
-	reqClaim := jwt.NewWithClaims(jwt.SigningMethodES256, SetClaims) //创建一个新的token对象
+	reqClaim := jwt.NewWithClaims(jwt.SigningMethodHS256, SetClaims) //创建一个新的token对象
 	token, err := reqClaim.SignedString(JwtKey)                      //使用密钥进行签名
 	if err != nil {
 		return "", errmsg.ERROR_TOKEN_WRONG
@@ -38,10 +38,10 @@ func SetToken(username string, password string) (string, int) {
 
 // CheckToken 验证token
 func CheckToken(token string) (*MyClaims, int) {
-	settoken, _ := jwt.ParseWithClaims(token, &MyClaims{}, func(token *jwt.Token) (interface{}, error) {
+	setToken, _ := jwt.ParseWithClaims(token, &MyClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return JwtKey, nil
 	})
-	if key, code := settoken.Claims.(*MyClaims); code && settoken.Valid {
+	if key, ok := setToken.Claims.(*MyClaims); ok && setToken.Valid {
 		return key, errmsg.SUCCESS
 	} else {
 		return nil, errmsg.ERROR_TOKEN_WRONG
@@ -55,25 +55,42 @@ func JwtToken() gin.HandlerFunc {
 		code := errmsg.SUCCESS
 		if tokenHeader == "" {
 			code = errmsg.ERROR_TOKEN_EXIST
+			c.JSON(200, gin.H{
+				"code":    code,
+				"message": errmsg.GetErrMsg(code),
+			})
+			c.Abort()
+			return
 		}
-		checkToken := strings.SplitN(tokenHeader, "", 2)
-		if len(checkToken) != 2 && checkToken[0] != "Bearer" {
+		checkToken := strings.SplitN(tokenHeader, " ", 2)
+		if len(checkToken) != 2 && checkToken[0] != "Bearer" { //todo 或许是||而不是&&
 			code = errmsg.ERROR_TOKEN_TYPE_WRONG
+			c.JSON(200, gin.H{
+				"code":    code,
+				"message": errmsg.GetErrMsg(code),
+			})
 			c.Abort()
+			return
 		}
-		key, Tcode := CheckToken(checkToken[1])
-		if Tcode == errmsg.ERROR {
+		key, tCode := CheckToken(strings.TrimSpace(checkToken[1])) // 验证token
+		if tCode == errmsg.ERROR_TOKEN_WRONG {
 			code = errmsg.ERROR_TOKEN_WRONG
+			c.JSON(200, gin.H{
+				"code":    code,
+				"message": errmsg.GetErrMsg(code),
+			})
 			c.Abort()
+			return
 		}
 		if time.Now().Unix() > key.ExpiresAt {
 			code = errmsg.ERROR_TOKEN_RUNTIME
+			c.JSON(200, gin.H{
+				"code":    code,
+				"message": errmsg.GetErrMsg(code),
+			})
 			c.Abort()
+			return
 		}
-		c.JSON(200, gin.H{
-			"code":    code,
-			"message": errmsg.GetErrMsg(code),
-		})
 		c.Set("username", key.Username)
 		c.Next()
 	}
