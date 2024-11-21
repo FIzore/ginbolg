@@ -1,2 +1,2 @@
-time="2024-11-20T11:23:12+08:00" level=info Agent="Apifox/1.0.0 (https://apifox.com)" DataSize=730 HoseName=LAPTOP-522RRF4I Ip="::1" Method=GET Path=/api/v1/users SpendTime="2 ms" Status=200
+time="2024-11-21T14:17:22+08:00" level=info Agent="Apifox/1.0.0 (https://apifox.com)" DataSize=730 HoseName=LAPTOP-522RRF4I Ip="::1" Method=GET Path=/api/v1/users SpendTime="2 ms" Status=200
 time="2024-11-20T11:23:38+08:00" level=info Agent="Apifox/1.0.0 (https://apifox.com)" DataSize=730 HoseName=LAPTOP-522RRF4I Ip="::1" Method=GET Path=/api/v1/users SpendTime="15 ms" Status=200
